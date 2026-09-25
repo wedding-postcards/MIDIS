@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Мидис · проект, бизнес-задачи, конкуренты и экосистема</title>
+<style>
+  :root{
+    --bg:#050505;
+    --card:#0d0d0d;
+    --line:#3a3a3a;
+    --border:#232323;
+    --border-hover:#4a4a4a;
+    --txt:#e8e8e8;
+    --txt-dim:#8a8a8a;
+    --txt-faint:#555;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;overflow:hidden;}
+  body{
+    background:var(--bg);
+    color:var(--txt);
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    user-select:none;-webkit-user-select:none;
+  }
+
+  /* ── header ─────────────────────────────── */
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 22px;pointer-events:none;
+  }
+  .logo{font-weight:700;font-size:16px;letter-spacing:-.02em;pointer-events:auto;}
+  .logo span{color:var(--txt-dim);font-weight:400;}
+  .chips{display:flex;gap:6px;pointer-events:auto;}
+  .chip{
+    font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+    border:1px solid var(--border);border-radius:20px;
+    padding:5px 12px;color:var(--txt-dim);font-family:inherit;
+    background:rgba(13,13,13,.85);cursor:pointer;transition:.25s;
+  }
+  .chip:hover{color:var(--txt);border-color:var(--border-hover);}
+
+  /* ── viewport / canvas ──────────────────── */
+  #viewport{
+    position:fixed;inset:0;
+    overflow:hidden;
+    cursor:grab;
+    touch-action:none;
+  }
+  #viewport.panning{cursor:grabbing;}
+  body.pen #viewport{cursor:crosshair;}
+  #canvas{
+    position:absolute;top:0;left:0;
+    width:7000px;height:9000px;
+    transform-origin:0 0;
+    background-image:radial-gradient(circle, rgba(255,255,255,.07) 1px, transparent 1.1px);
+    background-size:26px 26px;
+  }
+  #content{
+    position:absolute;left:3525px;top:3500px;
+    width:1200px;
+  }
+  #ecosystem{
+    position:absolute;left:4775px;top:3500px;
+    width:1200px;padding:10px 35px 90px;
+  }
+  #ink{
+    position:absolute;top:0;left:0;
+    width:7000px;height:9000px;
+    pointer-events:none;
+    z-index:10; /* рисование поверх карточек */
+  }
+  #ink path{
+    fill:none;stroke:#fff;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;
+    opacity:.9;
+  }
+
+  /* ── hero ───────────────────────────────── */
+  .hero{
+    display:flex;flex-direction:column;align-items:center;
+    text-align:center;padding:10px 20px 30px;
+  }
+  .hero h1{
+    font-size:54px;font-weight:700;letter-spacing:-.03em;line-height:1.05;
+  }
+  .hero h1 em{font-style:normal;color:var(--txt-dim);}
+  .fan{margin-top:30px;width:620px;opacity:.85;}
+  .fan text{fill:#9a9a9a;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;font-family:inherit;}
+  .fan .node{fill:#dcdcdc;}
+  .fan path{stroke:#3d3d3d;stroke-width:.7;fill:none;}
+  .fan line{stroke:#3d3d3d;stroke-width:.7;}
+
+  /* ── board ──────────────────────────────── */
+  .board{
+    position:relative;
+    padding:20px 20px 60px;
+  }
+  #wires{
+    position:absolute;inset:0;width:100%;height:100%;
+    pointer-events:none;z-index:0;
+  }
+  #wires path{stroke:var(--line);stroke-width:1;fill:none;}
+  #wires circle{fill:#cfcfcf;}
+
+  /* ── cards ──────────────────────────────── */
+  .node-card{
+    position:relative;z-index:2;
+    width:460px;
+    background:var(--card);
+    border:1px solid var(--border);
+    margin:70px 0;
+    opacity:0;transform:translateY(26px);
+    transition:opacity .7s ease, transform .7s ease, border-color .25s, box-shadow .25s;
+    cursor:pointer;
+  }
+  body.pen .node-card{cursor:crosshair;}
+  .node-card.show{opacity:1;transform:translateY(0);}
+  .node-card:hover{border-color:var(--border-hover);box-shadow:0 12px 40px rgba(0,0,0,.55);}
+  .node-card.left{margin-right:auto;}
+  .node-card.right{margin-left:auto;}
+  .node-card.center{margin-left:auto;margin-right:auto;}
+
+  .thumb{height:140px;position:relative;overflow:hidden;}
+  .thumb::after{
+    content:"";position:absolute;inset:0;
+    background-image:radial-gradient(circle,rgba(255,255,255,.10) 1px,transparent 1px);
+    background-size:9px 9px;
+    mix-blend-mode:overlay;
+  }
+  .thumb .num{
+    position:absolute;right:12px;bottom:6px;
+    font-size:64px;font-weight:700;letter-spacing:-.05em;
+    color:rgba(255,255,255,.10);line-height:1;
+  }
+  .t1{background:linear-gradient(135deg,#2b1c10,#743d12 55%,#c96a1e);}
+  .t2{background:linear-gradient(135deg,#101821,#1d3242 60%,#3c6a86);}
+  .t3{background:linear-gradient(135deg,#1d1022,#3d1f4d 55%,#7b3f96);}
+  .t4{background:linear-gradient(135deg,#0d1f16,#1c4630 60%,#3a8a5c);}
+  .t5{background:linear-gradient(135deg,#211c0d,#4d431f 55%,#96843f);}
+  .t6{background:linear-gradient(135deg,#210d0f,#4d1f24 55%,#963f4a);}
+  .t7{background:linear-gradient(135deg,#0d1e21,#1f4a4d 55%,#3f9096);}
+  .t8{background:linear-gradient(135deg,#1f0d1a,#4d1f40 55%,#963f7c);}
+  .t9{background:linear-gradient(135deg,#141f0d,#33501c 55%,#6d9a35);}
+  .t0{background:linear-gradient(135deg,#161616,#2c2c2c 55%,#4e4e4e);}
+
+  .card-body{padding:16px 16px 12px;}
+  .meta{display:flex;font-size:11px;line-height:1.9;}
+  .meta b{color:var(--txt-dim);font-weight:400;min-width:96px;}
+  .meta span{color:var(--txt);font-weight:500;}
+  .card-title{font-size:15px;font-weight:600;letter-spacing:-.01em;margin-bottom:8px;}
+
+  .details{max-height:0;overflow:hidden;transition:max-height .5s ease;}
+  .dwrap{border-top:1px solid var(--border);margin-top:10px;padding-top:2px;}
+  .sub{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--txt-faint);margin:12px 0 7px;}
+  .tags{display:flex;flex-wrap:wrap;gap:5px;}
+  .tags i{font-style:normal;font-size:10.5px;color:#c9c9c9;border:1px solid #2b2b2b;border-radius:14px;padding:3px 9px;background:#101010;line-height:1.4;}
+  .details p{font-size:12px;color:#bdbdbd;line-height:1.6;margin:10px 0 4px;}
+  .details ul{list-style:none;margin:0 0 4px;}
+  .details li{
+    position:relative;padding:4px 0 4px 16px;
+    font-size:12px;color:#bdbdbd;line-height:1.5;
+  }
+  .details li::before{
+    content:"";position:absolute;left:2px;top:11px;
+    width:4px;height:4px;border-radius:50%;background:#7a7a7a;
+  }
+  .details li s{color:#666;}
+  .card-foot{
+    padding:9px 16px;border-top:1px solid var(--border);
+    font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--txt-dim);
+  }
+  .card-foot .more::after{content:"+";margin-left:6px;display:inline-block;transition:transform .3s;}
+  .node-card.open .card-foot .more::after{transform:rotate(45deg);}
+  .node-card.open .details{max-height:1200px;}
+
+  /* ── toolbar ────────────────────────────── */
+  .toolbar{
+    position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+    z-index:60;display:flex;align-items:center;gap:2px;
+    background:rgba(13,13,13,.92);
+    border:1px solid var(--border);border-radius:12px;
+    padding:5px;backdrop-filter:blur(8px);
+  }
+  .tool{
+    width:34px;height:34px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--txt-dim);cursor:pointer;transition:.2s;
+    font-size:14px;
+  }
+  .tool:hover{color:var(--txt);background:#1a1a1a;}
+  .tool.active{color:#050505;background:#e8e8e8;}
+  .tool svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+  .sep{width:1px;height:20px;background:var(--border);margin:0 5px;}
+  .zoom-val{
+    min-width:44px;text-align:center;
+    font-size:11px;color:var(--txt-dim);letter-spacing:.04em;
+  }
+
+  :root{--line:#544832;--border:#31291d;--border-hover:#826e46;--txt-dim:#a99b80;}
+  .hero{padding:44px 24px 16px;}
+  .hero .eyebrow{font-size:11px;letter-spacing:.24em;color:#bd9e65;text-transform:uppercase;margin-bottom:14px;}
+  .hero h1 em{color:#bd9e65;}
+  .hero .lede{font-size:18px;line-height:1.55;color:#aaa;max-width:980px;margin-top:18px;}
+  .summary{width:calc(100% - 70px);margin:18px auto 28px;border:1px solid var(--border);background:var(--card);padding:22px 26px;}
+  .summary-top{display:flex;align-items:baseline;gap:28px;margin-bottom:12px;}
+  .summary-stat strong{font-size:30px;color:#e8d4a8;display:block;}
+  .summary-stat span{font-size:13px;color:#989088;}
+  .summary p{font-size:15px;line-height:1.55;color:#a9a9a9;}
+  .summary .market-takeaway{border-top:1px solid var(--border);margin-top:14px;padding-top:12px;color:#d1c8b8;}
+  .summary a{color:#cbb27d;}
+  .board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;padding:10px 35px 80px;}
+  #wires{display:none;}
+  .node-card,.node-card.left,.node-card.right,.node-card.center{width:auto;margin:0;min-height:258px;opacity:1;transform:none;}
+  .node-card{cursor:pointer;}
+  .node-card:focus-within{border-color:#bd9e65;}
+  .node-card .details{max-height:0;opacity:0;overflow:hidden;transition:max-height .4s ease,opacity .25s ease;}
+  .node-card.open .details{max-height:1200px;opacity:1;}
+  .node-card .dwrap{padding:0 0 14px;margin-top:10px;}
+  .biz-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:15px;}
+  .biz-grid>div{border-left:2px solid #7d6845;padding-left:11px;}
+  .biz-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d9bf8b;}
+  .biz-grid p{font-size:14px;line-height:1.5;color:#d4cfc5;margin:7px 0 0;}
+  @media(max-width:700px){.biz-grid{grid-template-columns:1fr;}}
+  .card-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:15px;padding:11px 0 12px;border:0;border-top:1px solid #403626;background:none;color:#d7bd87;text-align:left;font-size:12px;font-weight:600;font-family:inherit;line-height:1.3;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}
+  .card-toggle:hover,.card-toggle:focus-visible{color:#fff;outline:none;}
+  .toggle-mark{font-size:18px;font-weight:400;line-height:1;transition:transform .3s;}
+  .node-card.open .toggle-mark{transform:rotate(45deg);}
+  @media(prefers-reduced-motion:reduce){.node-card .details,.toggle-mark{transition:none;}}
+  .node-card.direct{border-color:#675235;}
+  .node-card:first-of-type{border-color:#bd9e65;box-shadow:0 0 0 1px rgba(189,158,101,.22),0 12px 36px rgba(0,0,0,.25);}
+  .node-card.partial{border-color:#3b3934;}
+  .group-heading{grid-column:1/-1;margin-top:20px;border-bottom:1px solid #4b3e2b;padding:8px 0 18px;}
+  .group-heading h2{font-size:27px;line-height:1.2;color:#eee7d9;}
+  .group-heading p{font-size:14px;color:#a8a098;margin-top:7px;}
+  .group-kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#c5aa76;margin-bottom:8px;}
+  .capacity{display:flex;align-items:baseline;gap:10px;margin-top:11px;}
+  .capacity b{font-size:18px;color:#e8d4a8;}
+  .capacity span{font-size:12px;color:#827e78;}
+  .feature-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
+  .feature-tags span{font-size:12px;color:#c9c0af;background:#282622;border:1px solid #484138;border-radius:20px;padding:4px 7px;}
+  .thumb{height:52px;background:linear-gradient(100deg,#1e1a14,#403520 70%,#5b4929);}
+  .thumb::after{opacity:.35;}
+  .thumb .num{font-size:52px;bottom:-9px;}
+  .card-index{position:absolute;left:15px;top:18px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#d5bb84;z-index:2;}
+  .card-title{font-size:21px;margin-bottom:10px;}
+  .card-body{padding:16px 18px 18px;}
+  .meta{font-size:13px;line-height:1.45;margin:5px 0;gap:8px;}
+  .meta b{min-width:54px;}
+  .meta span{font-weight:400;}
+  .card-fact{font-size:12px;color:#d1c8b8;line-height:1.5;margin-top:12px;min-height:36px;}
+  .card-links{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;}
+  .card-links a{font-size:12px;color:#ddc68e;text-decoration:none;border:1px solid #4a3c27;border-radius:30px;padding:6px 10px;transition:.2s;}
+  .card-links a:hover{color:#fff;border-color:#b3904c;background:#3e311d;}
+  .notes{font-size:11px;line-height:1.6;color:#8d8578;max-width:900px;margin:0 auto 100px;padding:0 20px;}
+  .notes a{color:#bca779;}
+  .chip{color:#c8b68f;}
+  @media(max-width:700px){header{padding:10px;flex-wrap:wrap;gap:7px;}.logo{font-size:13px;}.logo span{display:none;}.chips{gap:4px;}.chip{font-size:8px;padding:6px 7px;}}
+  /* ── ecosystem ──────────────────────────── */
+  .eco-hero{text-align:center;padding:10px 40px 28px;}
+  .eco-hero .eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#c9ad79;margin-bottom:14px;}
+  .eco-hero h1{font-size:54px;line-height:1.05;letter-spacing:-.03em;color:#f2ede5;}
+  .eco-hero h1 em{font-style:normal;color:#b89a65;}
+  .eco-hero p{font-size:17px;line-height:1.55;color:#a9a298;max-width:850px;margin:17px auto 0;}
+  .eco-premise{margin:0 20px 22px;padding:17px 22px;border:1px solid #5a472b;background:linear-gradient(110deg,#231b12,#151412);display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:center;}
+  .eco-premise b{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#d1b078;}
+  .eco-premise p{font-size:16px;line-height:1.55;color:#e8dcc9;}
+  .eco-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0 20px;}
+  .eco-card{border:1px solid #41392d;background:#111110;padding:23px 24px 21px;min-height:286px;}
+  .eco-card .eco-number{display:block;color:#a98954;font-size:12px;letter-spacing:.14em;margin-bottom:17px;}
+  .eco-card h2{font-size:26px;letter-spacing:-.02em;color:#eee7dc;margin-bottom:12px;}
+  .eco-role{font-size:16px;line-height:1.5;color:#dfceac;margin-bottom:13px;}
+  .eco-card ul{list-style:none;margin:0 0 18px;padding:0;}
+  .eco-card li{font-size:14px;line-height:1.55;color:#bdb7ad;margin:7px 0;padding-left:13px;position:relative;}
+  .eco-card li::before{content:"·";position:absolute;left:0;color:#c9a76d;}
+  .eco-card .eco-source{border-top:1px solid #302b24;padding-top:13px;font-size:12px;line-height:1.5;color:#8f8a81;}
+  .eco-card a,.eco-mechanic a,.eco-world a,.eco-evidence a,.eco-gate a{color:#dbc08a;text-decoration:none;border-bottom:1px solid #675334;}
+  .eco-card a:hover,.eco-mechanic a:hover,.eco-world a:hover,.eco-evidence a:hover,.eco-gate a:hover{color:#fff;}
+  .eco-card.feature{background:linear-gradient(140deg,#211b13,#131210);border-color:#6a512e;}
+  .eco-mechanic{margin:24px 20px 0;border:1px solid #5a472b;background:#171512;padding:23px 24px 24px;}
+  .eco-mechanic h2{font-size:25px;color:#eee2cf;margin-bottom:8px;}
+  .eco-mechanic>p{font-size:15px;line-height:1.55;color:#bfb5a5;margin-bottom:17px;}
+  .eco-mechanic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+  .eco-mechanic-grid>div{background:#211d17;border:1px solid #51432e;padding:14px 15px;}
+  .eco-mechanic-grid b{font-size:15px;color:#e8d4ac;}
+  .eco-mechanic-grid p{font-size:14px;line-height:1.5;color:#c5baaa;margin-top:6px;}
+  .eco-ref-title{font-size:18px;color:#eee2cf;margin:23px 20px 0;}
+  .eco-world{margin:18px 20px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+  .eco-world>div{padding:14px 15px;border:1px solid #40382c;background:#111110;}
+  .eco-world b{font-size:14px;color:#e8d4ac;}
+  .eco-world p{font-size:14px;line-height:1.5;color:#a9a197;margin-top:6px;}
+  .eco-gate{margin:18px 20px 0;padding:17px 20px;border-left:3px solid #b58c4e;background:#211b13;}
+  .eco-gate b{font-size:15px;color:#efd8ab;}
+  .eco-gate p{font-size:14px;line-height:1.55;color:#cfc0a9;margin-top:6px;}
+  .eco-plan{margin:14px 20px 0;padding:17px 20px;border:1px solid #51432e;background:#171512;}
+  .eco-plan b{font-size:15px;color:#efd8ab;}
+  .eco-plan p{font-size:14px;line-height:1.6;color:#d0c4b0;margin-top:7px;}
+  .eco-evidence{margin:16px 20px 0;font-size:12px;line-height:1.6;color:#91887a;}
+  /* ── business task ──────────────────────── */
+  #business{position:absolute;left:-1250px;top:0;width:1200px;margin:0;padding:10px 35px 90px;border:0;background:none;}
+  .biz-hero{text-align:center;padding:10px 35px 27px;}
+  .biz-hero .eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#c9ad79;margin-bottom:14px;}
+  .biz-hero h2{font-size:54px;line-height:1.05;letter-spacing:-.03em;color:#f2ede5;}
+  .biz-hero h2 em{font-style:normal;color:#b89a65;}
+  .biz-hero p{font-size:17px;line-height:1.55;color:#a9a298;max-width:850px;margin:17px auto 0;}
+  .biz-pillars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 20px;}
+  .biz-pillar{padding:21px 20px;border:1px solid #41392d;background:#111110;min-height:235px;}
+  .biz-pillar .num{font-size:12px;letter-spacing:.14em;color:#a98954;margin-bottom:22px;display:block;}
+  .biz-pillar h3{font-size:21px;line-height:1.18;color:#eee7dc;margin-bottom:13px;}
+  .biz-pillar p{font-size:15px;line-height:1.5;color:#bbb3a6;}
+  .biz-pillar .measure{margin-top:16px;padding-top:13px;border-top:1px solid #332c22;font-size:13px;line-height:1.45;color:#d7bd87;}
+  .biz-insight{margin:22px 20px 0;padding:22px 24px;border:1px solid #5a472b;background:linear-gradient(125deg,#241c12,#151412);}
+  .biz-insight b{font-size:14px;color:#efdbb4;}
+  .biz-insight p{font-size:14px;line-height:1.55;color:#c8bdab;margin-top:9px;}
+  .biz-insight a{color:#dbc08a;text-decoration:none;border-bottom:1px solid #675334;}
+  /* ── project introduction ───────────────── */
+  #project{position:absolute;left:-2500px;top:0;width:1200px;padding:10px 35px 90px;}
+  .project-hero{text-align:center;padding:10px 35px 36px;}
+  .project-hero .eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#c9ad79;margin-bottom:14px;}
+  .project-hero h2{font-size:72px;line-height:1;letter-spacing:-.05em;color:#f2ede5;}
+  .project-hero p{font-size:16px;line-height:1.5;color:#aaa298;margin:20px auto 0;}
+  .project-scale{margin:0 20px 16px;padding:30px 34px;border:1px solid #6a512e;background:linear-gradient(125deg,#291f14,#11100e);}
+  .project-scale strong{display:block;font-size:72px;line-height:1;color:#ead3a4;letter-spacing:-.04em;}
+  .project-scale span{display:block;font-size:16px;color:#d9c5a3;margin-top:10px;}
+  .project-brief{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0 20px;}
+  .project-brief article{border:1px solid #41392d;background:#111110;padding:22px 24px;min-height:150px;}
+  .project-brief b{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#b99b69;margin-bottom:14px;}
+  .project-brief p{font-size:16px;line-height:1.45;color:#e8dfd0;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Мидис<span> / стратегия клуба</span></div>
+  <div class="chips">
+    <button class="chip" id="showProject" type="button">Проект</button>
+    <button class="chip" id="showBusiness" type="button">Бизнес-задачи</button>
+    <button class="chip" id="showCompetitors" type="button">Конкуренты</button>
+    <button class="chip" id="showEcosystem" type="button">Экосистема</button>
+    <button class="chip" type="button" onclick="document.getElementById('zoomFit').click()">Вся карта</button>
+  </div>
+</header>
+<div id="viewport">
+  <div id="canvas">
+    <svg id="ink"></svg>
+    <div id="content">
+      <section class="hero">
+        <div class="eyebrow">Исследование рынка · 25 сентября 2026</div>
+        <h1>Карта конкурентов<br><em>Саратов</em></h1>
+        <p class="lede">Шесть клубов, с которыми «Мидис» стоит сравнить по масштабу, VIP-формату и дополнительному сервису.</p>
+      </section>
+      <div class="summary">
+        <div class="summary-top">
+          <div class="summary-stat"><strong>6</strong><span>сопоставимых предложений в Саратове</span></div>
+        </div>
+        <p><b>Что видно на рынке:</b> VIP-зоны, консоли, групповые места, бар, акции и даже приложение уже есть у разных клубов. Предложение для «Мидис» — объединить бронь, посещения, награды и жизнь сообщества в одном сервисе.</p>
+        <p class="market-takeaway">Порядок отражает масштаб бренда и сходство опубликованного формата, без оценки выручки и загрузки. Адрес «Мидис» позволит уточнить географию конкуренции. <a href="https://langame.ru/computerniy_club_saratov" target="_blank" rel="noopener noreferrer">Каталог клубов ↗</a></p>
+      </div>
+      <main class="board" id="board">
+        <div class="group-heading"><div class="group-kicker">Основная группа</div><h2>Ближе всего по формату</h2><p>Масштаб, VIP-места и дополнительные сценарии посещения.</p></div>
+<article class="node-card direct">
+          <div class="thumb t6"><span class="card-index">#1 / Близкий формат</span><span class="num">01</span></div>
+          <div class="card-body">
+            <h3 class="card-title">Colizeum</h3>
+            <div class="meta"><b>Адрес</b><span>Центр: Рабочая, 49; Блинова, 23</span></div>
+            <div class="capacity"><b>35 / 19 ПК</b><span>по опубликованным данным</span></div>
+            <div class="feature-tags"><span>2 клуба в Саратове</span><span>25 VIP в центре</span><span>буткемпы</span><span>турниры сети</span></div>
+            <div class="details" id="details-1" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Игровые часы в общем зале и VIP, PS5; в филиале на Блинова также продают еду и напитки.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>Центр публикует кэшбэк и бонус новичку; Блинова — бонусы за покупки в баре и такси. Сеть проводит турниры.</p></div></div><div class="card-links"><a href="https://langame.ru/799452185_computerniy_club_colizeum-saratov-centr_saratov" target="_blank" rel="noopener noreferrer">Центр: ПК ↗</a><a href="https://langame.ru/799453699_computerniy_club_colizeum-blinova_saratov" target="_blank" rel="noopener noreferrer">Блинова: ПК ↗</a><a href="https://colizeumarena.com/blog/club/colizeum-saratov-centr/" target="_blank" rel="noopener noreferrer">Центр ↗</a><a href="https://colizeumarena.com/blog/club/saratov_blinova/" target="_blank" rel="noopener noreferrer">Блинова ↗</a><a href="https://2gis.ru/saratov/firm/70000001065314313" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/colizeum_saratov_centr" target="_blank" rel="noopener noreferrer">VK ↗</a><a href="https://colizeumarena.com/franchise/" target="_blank" rel="noopener noreferrer">Сеть ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-1"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
+          </div>
+        </article>
+<article class="node-card direct">
+          <div class="thumb t4"><span class="card-index">#2 / Близкий формат</span><span class="num">02</span></div>
+          <div class="card-body">
+            <h3 class="card-title">Voltage</h3>
+            <div class="meta"><b>Адрес</b><span>Black: Астраханская, 102 к8; Reborn: Московская, 84; Lounge: Усть-Курдюмская, 9</span></div>
+            <div class="capacity"><b>55 / 35 / 19 ПК</b><span>по опубликованным данным</span></div>
+            <div class="feature-tags"><span>3 формата в городе</span><span>VIP и PRO</span><span>кальян в Black и Lounge</span><span>бар</span></div>
+            <div class="details" id="details-2" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Почасовые и пакетные тарифы Premium / PRO / VIP, зоны DUO / TRIO, PS5, бар и кальян в Black.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>В профиле Black заявлены 300 ₽ за возвращение, бонусы за отзывы, скидки в день рождения и утром; сеть сообщает о турнирах.</p></div></div><div class="card-links"><a href="https://langame.ru/799452783_computerniy_club_voltage-black_saratov" target="_blank" rel="noopener noreferrer">Black ↗</a><a href="https://langame.ru/799448415_computerniy_club_voltage-reborn_saratov" target="_blank" rel="noopener noreferrer">Reborn ↗</a><a href="https://langame.ru/799453165_computerniy_club_voltage-lounge_saratov" target="_blank" rel="noopener noreferrer">Lounge ↗</a><a href="https://2gis.ru/saratov/firm/70000001046676304" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/voltage_saratov" target="_blank" rel="noopener noreferrer">VK ↗</a><a href="https://t.me/voltage_black" target="_blank" rel="noopener noreferrer">Telegram ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-2"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
+          </div>
+        </article>
+<article class="node-card direct">
+          <div class="thumb t5"><span class="card-index">#3 / Близкий формат</span><span class="num">03</span></div>
+          <div class="card-body">
+            <h3 class="card-title">Зевс</h3>
+            <div class="meta"><b>Адрес</b><span>Советская, 69</span></div>
+            <div class="capacity"><b>69 ПК</b><span>по опубликованным данным</span></div>
+            <div class="feature-tags"><span>42 VIP</span><span>6 PS5</span><span>кальян</span><span>фуд-корт</span></div>
+            <div class="details" id="details-3" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Игровое время в общем зале и VIP, шесть PS5, кальян и фуд-корт.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>В профиле клуба заявлены 100 ₽ на счёт при регистрации и один игровой час за приведённого друга.</p></div></div><div class="card-links"><a href="https://langame.ru/799451269_computerniy_club_zeus_saratov" target="_blank" rel="noopener noreferrer">LANGAME ↗</a><a href="https://2gis.ru/saratov/firm/70000001064280422" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/zeusgl64" target="_blank" rel="noopener noreferrer">VK ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-3"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
+          </div>
+        </article>
+<article class="node-card direct">
+          <div class="thumb t1"><span class="card-index">#4 / Близкий формат</span><span class="num">04</span></div>
+          <div class="card-body">
+            <h3 class="card-title">Монза</h3>
+            <div class="meta"><b>Адрес</b><span>Большая Казачья, 113/38</span></div>
+            <div class="capacity"><b>33 ПК</b><span>по опубликованным данным</span></div>
+            <div class="feature-tags"><span>13 VIP</span><span>бар</span><span>кальян</span></div>
+            <div class="details" id="details-6" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Общий зал и VIP, четыре PS5 Pro, кальян и снэк-бар.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>В проверенном профиле клуба публичная программа лояльности или реферальная акция не указана.</p></div></div><div class="card-links"><a href="https://langame.ru/799462264_computerniy_club_monza_saratov" target="_blank" rel="noopener noreferrer">LANGAME ↗</a><a href="https://2gis.ru/saratov/firm/70000001117750386" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/monza.saratov" target="_blank" rel="noopener noreferrer">VK ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-6"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
+          </div>
+        </article>
+        <div class="group-heading"><div class="group-kicker">Дополнительное сравнение</div><h2>Другие сильные альтернативы</h2><p>Сопоставимы по игровым местам; набор услуг отличается от предполагаемого формата «Мидис».</p></div>
+<article class="node-card partial">
+          <div class="thumb t3"><span class="card-index">#5 / Альтернатива</span><span class="num">05</span></div>
+          <div class="card-body">
+            <h3 class="card-title">CyberX Community</h3>
+            <div class="meta"><b>Адрес</b><span>Вольская, 83</span></div>
+            <div class="capacity"><b>42 ПК</b><span>по опубликованным данным</span></div>
+            <div class="feature-tags"><span>9 залов</span><span>VIP-тариф</span><span>4 TV-зоны</span></div>
+            <div class="details" id="details-4" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Тарифы Standard / VIP на 1, 3, 5 часов и ночь; четыре TV-зоны.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>Собственное приложение упрощает повторную бронь; публичную бонусную программу именно саратовского филиала не удалось подтвердить.</p></div></div><div class="card-links"><a href="https://cyberxcommunity.ru/kluby/rossiya/saratov/volskaya.html" target="_blank" rel="noopener noreferrer">Клуб ↗</a><a href="https://cyberxcommunity.ru/" target="_blank" rel="noopener noreferrer">Сайт ↗</a><a href="https://2gis.ru/saratov/firm/70000001096094795" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/club228559670" target="_blank" rel="noopener noreferrer">VK ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-4"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
+          </div>
+        </article>
+<article class="node-card partial">
+          <div class="thumb t2"><span class="card-index">#6 / Альтернатива</span><span class="num">06</span></div>
+          <div class="card-body">
+            <h3 class="card-title">Сайбер Кинг</h3>
+            <div class="meta"><b>Адрес</b><span>пр. Петра Столыпина, 10</span></div>
+            <div class="capacity"><b>40 ПК</b><span>по опубликованным данным</span></div>
+            <div class="feature-tags"><span>кальян</span><span>Boot Camp</span><span>снэк-бар</span></div>
+            <div class="details" id="details-5" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Игровое время на 40 ПК, PS5, кальян и снэк-бар.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>В проверенных открытых страницах клуба формальная программа бонусов или приглашений не опубликована.</p></div></div><div class="card-links"><a href="https://cyber-king64.clients.site/" target="_blank" rel="noopener noreferrer">Клуб ↗</a><a href="https://2gis.ru/saratov/firm/70000001052144380" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/cyberking64" target="_blank" rel="noopener noreferrer">VK ↗</a><a href="https://t.me/cyber_king64" target="_blank" rel="noopener noreferrer">Telegram ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-5"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
+          </div>
+        </article>
+      </main>
+      <section id="project" aria-labelledby="project-title">
+        <div class="project-hero">
+          <div class="eyebrow">Исходные данные проекта</div>
+          <h2 id="project-title">Мидис</h2>
+          <p>Компьютерный клуб · Саратов</p>
+        </div>
+        <div class="project-scale"><strong>30–40</strong><span>планируемых посадочных мест</span></div>
+        <div class="project-brief">
+          <article><b>Формат</b><p>Премиальное позиционирование — рабочая гипотеза проекта.</p></article>
+          <article><b>Визуальный ориентир</b><p>Лофт-пространство и античные мотивы для цифрового мира клуба.</p></article>
+        </div>
+      </section>
+      <section id="business" aria-labelledby="business-title">
+        <div class="biz-hero">
+          <div class="eyebrow">Мидис · цели бизнеса</div>
+          <h2 id="business-title">Четыре задачи <em>клуба</em></h2>
+          <p>Четыре результата, ради которых создаём цифровую экосистему.</p>
+        </div>
+        <div class="biz-pillars">
+          <article class="biz-pillar"><span class="num">01 / ПРИВЛЕЧЕНИЕ</span><h3>Приводить новых гостей</h3><p>Показать отличие «Мидис» в поиске, картах и рекламе и довести интерес до первого оплаченного визита.</p><div class="measure">Измеряем: новых гостей с оплатой.</div></article>
+          <article class="biz-pillar"><span class="num">02 / ЗАГРУЗКА</span><h3>Заполнять часы низкого спроса</h3><p>Показывать доступные места и подходящие предложения в те часы, когда часть компьютеров простаивает.</p><div class="measure">Измеряем: оплаченные ПК-часы по дням и зонам.</div></article>
+          <article class="biz-pillar"><span class="num">03 / ВОЗВРАТ</span><h3>Возвращать игроков с друзьями</h3><p>Повторная бронь, события и личный прогресс дают гостю конкретный повод прийти снова или собрать команду.</p><div class="measure">Измеряем: повторные визиты и оплаченные групповые брони.</div></article>
+          <article class="biz-pillar"><span class="num">04 / ПРИБЫЛЬ</span><h3>Увеличивать прибыль клуба</h3><p>VIP, пакеты и дополнительные услуги помогают увеличить доход; каждую акцию оцениваем с учётом затрат на услугу и награду.</p><div class="measure">Измеряем: прибыль клуба после всех расходов.</div></article>
+        </div>
+        <div class="biz-insight"><b>Что показывает рынок</b><p>По данным АРКИ за II квартал 2026 года, около 80% выручки клубам дали игровые часы. По сравнению с тем же кварталом 2025 года гости стали играть чаще, а уникальных гостей на клуб стало меньше. Поэтому важны и приток новых игроков, и повторные визиты; итог каждой акции оцениваем по деньгам после затрат. <a href="https://arki.team/results/barometer" target="_blank" rel="noopener noreferrer">Барометр АРКИ ↗</a></p></div>
+      </section>
+      <div class="notes">Срез: 25.09.2026. Показаны клубы с публичными профилями без отметки о закрытии; сведения о местах, услугах и акциях могут меняться. Это выборка похожих предложений, а не все клубы Саратова. Данные о фактической загрузке и прибыли конкурентов не опубликованы.</div>
+    </div>
+    <section id="ecosystem" aria-labelledby="eco-title">
+      <div class="eco-hero">
+        <div class="eyebrow">Мидис · цифровая экосистема</div>
+        <h1 id="eco-title">Экосистема <em>клуба</em></h1>
+        <p>Путь гостя: узнал о клубе → выбрал место → оплатил игру → получил повод прийти снова и позвать друзей.</p>
+      </div>
+      <div class="eco-premise"><b>Что получит клуб</b><p>Сайт приводит к брони, приложение поддерживает контакт, а собственная программа связывает реальные посещения с наградами. Владелец управляет условиями и видит оплаченные визиты.</p></div>
+      <div class="eco-grid">
+        <article class="eco-card">
+          <span class="eco-number">01 / ПЕРВЫЙ ВИЗИТ</span>
+          <h2>Сайт</h2>
+          <p class="eco-role">Гость видит, чем клуб ему подходит, и сразу может забронировать игру.</p>
+          <ul>
+            <li>Фото зон, оборудование, цены, пакеты и события помогают выбрать «Мидис».</li>
+            <li>Из карт, поиска и рекламы — к выбору свободного места или соседних ПК для компании.</li>
+            <li>Связываем источник обращения с первым оплаченным визитом.</li>
+          </ul>
+          <div class="eco-source">Путь гостя начинается в разных каналах: <a href="https://yandex.ru/support/business-priority/ru/general/displaying" target="_blank" rel="noopener noreferrer">профиль в Картах ↗</a>; измерение броней — <a href="https://yandex.ru/support/metrica/ru/user-cases/online-store" target="_blank" rel="noopener noreferrer">Яндекс Метрика ↗</a>.</div>
+        </article>
+        <article class="eco-card">
+          <span class="eco-number">02 / ПОВТОРНЫЙ КОНТАКТ</span>
+          <h2>Приложение «Мидис»</h2>
+          <p class="eco-role">Один профиль на сайте и в телефоне: бронь, прогресс и награды всегда под рукой.</p>
+          <ul>
+            <li>Бронь, история визитов, баланс денариев (клубных баллов), награды и события.</li>
+            <li>Приглашение друга и бронь соседних мест помогают собрать компанию.</li>
+            <li>Уместные напоминания о доступной награде, событии или свободных местах.</li>
+          </ul>
+          <div class="eco-source">Похожий формат клуба: <a href="https://friendlyfireesports.com/" target="_blank" rel="noopener noreferrer">Friendly Fire соединяет бронь, прогресс, награды и друзей ↗</a>.</div>
+        </article>
+        <article class="eco-card">
+          <span class="eco-number">03 / УПРАВЛЕНИЕ ПРОГРАММОЙ</span>
+          <h2>Система лояльности</h2>
+          <p class="eco-role">Программа «Мидис» связывает бронь, подтверждённую игру и награды по правилам клуба.</p>
+          <ul>
+            <li>Начисляет денарии за ежедневную отметку, оплаченную игру, первый платный визит нового друга и участие в событиях.</li>
+            <li>Клуб меняет награды, условия, сроки и лимиты без переделки сайта или приложения.</li>
+            <li>Показывает оплаченные визиты по акциям и стоимость выданных наград.</li>
+          </ul>
+          <div class="eco-source">Отметки, приглашения и командные цели проектируем специально для «Мидис»; данные об оплате связываем с клубной системой.</div>
+        </article>
+        <article class="eco-card feature">
+          <span class="eco-number">04 / ПОВОД ВЕРНУТЬСЯ</span>
+          <h2>Игровой мир «Мидис»</h2>
+          <p class="eco-role">Личный прогресс и командные цели дают гостю повод вернуться, а друзьям — играть вместе.</p>
+          <ul>
+            <li>Каждая ежедневная отметка даёт денарии; серия видна в профиле, а пропуск не сжигает накопленные баллы.</li>
+            <li>Оплаченная игра, первый платный визит нового друга и турнир двигают к ценной награде быстрее.</li>
+            <li>«Легионы» могут объединять игроков в команды и давать повод собрать друзей на турнир.</li>
+          </ul>
+          <div class="eco-source">Клубный пример: <a href="https://friendlyfireesports.com/blog/friendly-fire-software-balance-patch" target="_blank" rel="noopener noreferrer">Friendly Fire настраивает ежедневные задания и выдачу наград ↗</a>.</div>
+        </article>
+      </div>
+      <div class="eco-mechanic">
+        <h2>Как устроена программа лояльности</h2>
+        <p>Баллы можно копить даже без визита; оплаченная игра и приглашённый друг ускоряют путь к награде.</p>
+        <div class="eco-mechanic-grid">
+          <div><b>01 · Отметиться</b><p>Каждый день в личном кабинете гость получает денарии и видит, сколько осталось до выбранной награды.</p></div>
+          <div><b>02 · Сыграть и пригласить</b><p>Оплаченная игра, первый платный визит нового гостя по приглашению или участие в турнире добавляют прогресс за действия в клубе.</p></div>
+          <div><b>03 · Выбрать награду</b><p>В каталоге могут быть игровой час, улучшение до VIP, напиток или участие в событии — если такие услуги есть в клубе.</p></div>
+          <div><b>04 · Забронировать игру</b><p>Гость применяет награду к брони, может докупить время или позвать друзей; клуб видит оплату и стоимость бонуса.</p></div>
+        </div>
+      </div>
+      <div class="eco-ref-title">Где похожие механики уже применяют</div>
+      <div class="eco-world" aria-label="Примеры программ лояльности">
+        <div><b>Friendly Fire · компьютерный клуб</b><p>Задания и награды дополняют игру с друзьями; за друга дают бонус после покупки им стартового пакета. <a href="https://friendlyfireesports.com/blog/friendly-fire-software-balance-patch" target="_blank" rel="noopener noreferrer">Задания ↗</a> · <a href="https://friendlyfireesports.com/locations/limassol" target="_blank" rel="noopener noreferrer">друг ↗</a></p></div>
+        <div><b>Bowlero · боулинг</b><p>Баллы за боулинг, еду и напитки; награда за покупку приглашённого друга, каталог призов и бонус за ежемесячный вход в кабинет. <a href="https://www.bowlero.com/mvb" target="_blank" rel="noopener noreferrer">MVB Rewards ↗</a></p></div>
+        <div><b>Riot · корейские PC bang</b><p>В акции 2026 года первый вход даёт малую награду где угодно, а остальной прогресс требует игры в клубе. <a href="https://playvalorant.com/ko-kr/news/announcements/2026-pcb-val-event/" target="_blank" rel="noopener noreferrer">Правила акции ↗</a></p></div>
+      </div>
+      <div class="eco-gate"><b>Игровой час — один из вариантов награды.</b><p>Гость копит денарии ежедневными отметками и быстрее продвигается за оплаченные визиты или покупку приглашённого друга. Час можно добавить к новой сессии или предложить для менее загруженного времени; гость может докупить игру и позвать друзей. Порог обмена, срок и доступное время клуб задаёт по своей загрузке и затратам.</p></div>
+      <div class="eco-plan"><b>Порядок запуска</b><p>Сайт, бронь, единый профиль и аналитика → денарии, каталог наград и приложение «Мидис» → командные задания, турниры и экран миссий на клубных ПК, когда гостям это интересно. Для запуска готовим понятные правила программы и тексты об обработке персональных данных с юридической проверкой.</p></div>
+      <p class="eco-evidence">Показатели результата: оплаченные визиты, загрузка часов низкого спроса и прибыль клуба после всех расходов. Ежедневные отметки показывают интерес гостя. Исследования для проектирования: <a href="https://doi.org/10.1093/jcr/ucac029" target="_blank" rel="noopener noreferrer">серии действий ↗</a> · <a href="https://pubsonline.informs.org/doi/abs/10.1287/isre.2022.1147" target="_blank" rel="noopener noreferrer">достижения и рейтинги ↗</a>.</p>
+    </section>
+  </div>
+</div>
+<div class="toolbar">
+  <div class="tool active" id="toolPan" title="Перемещение"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l-3-3M3 12l3 3M21 12l-3-3M21 12l3 3"/></svg></div>
+  <div class="tool" id="toolPen" title="Карандаш"><svg viewBox="0 0 24 24"><path d="M17 3l4 4L8 20l-5 1 1-5L17 3z"/></svg></div>
+  <div class="tool" id="toolUndo" title="Отменить штрих"><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 1 1v2M6 7l1 13h10l1-13"/></svg></div>
+  <div class="tool" id="toolClear" title="Стереть всё"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13h10l1-13"/></svg></div>
+  <div class="sep"></div>
+  <div class="tool" id="zoomOut" title="Уменьшить">−</div>
+  <div class="zoom-val" id="zoomVal">100%</div>
+  <div class="tool" id="zoomIn" title="Увеличить">+</div>
+  <div class="tool" id="zoomFit" title="Показать всё"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 1-2 2v-3"/></svg></div>
+</div>
+<script>
+
+  const viewport=document.getElementById('viewport');
+  const canvas=document.getElementById('canvas');
+  const ink=document.getElementById('ink');
+  const cards=[...document.querySelectorAll('.node-card')];
+  let lastDragAt=-1000;
+  function setCardOpen(card,open){
+    card.classList.toggle('open',open);
+    card.querySelector('.card-toggle').setAttribute('aria-expanded',String(open));
+    const panel=card.querySelector('.details');
+    panel.inert=!open;
+    panel.setAttribute('aria-hidden',String(!open));
+  }
+  cards.forEach(card=>card.addEventListener('click',e=>{
+    if(pen || performance.now()-lastDragAt<250 || e.target.closest('a'))return;
+    const opening=!card.classList.contains('open');
+    cards.forEach(other=>setCardOpen(other,other===card && opening));
+  }));
+  const PX=1025, PW=1200, BX=2275, BW=1200, CX=3525, CW=1200, EX=4775, EW=1200, TOTAL_X=1025, TOTAL_W=4950;
+
+  /* ── view state ─────────────────────────── */
+  let tx=0, ty=0, scale=1;
+  const MIN_S=.08, MAX_S=3;
+  const project=document.getElementById('project');
+  const business=document.getElementById('business');
+  const content=document.getElementById('content');
+  const ecosystem=document.getElementById('ecosystem');
+  const panels=[project,business,content,ecosystem];
+  function viewPad(){return Math.min(210,Math.max(130,innerHeight*.23));}
+  function positionPanels(){
+    const canvasH=canvas.offsetHeight;
+    const contentY=(canvasH-content.offsetHeight)/2;
+    content.style.top=contentY+'px';
+    project.style.top=((canvasH-project.offsetHeight)/2-contentY)+'px';
+    business.style.top=((canvasH-business.offsetHeight)/2-contentY)+'px';
+    ecosystem.style.top=(canvasH-ecosystem.offsetHeight)/2+'px';
+  }
+  function panelY(panel){return panel.offsetTop+((panel===project||panel===business)?content.offsetTop:0);}
+  function verticalBounds(){
+    const top=Math.min(...panels.map(panelY));
+    const bottom=Math.max(...panels.map(panel=>panelY(panel)+panel.offsetHeight));
+    return {top,bottom,height:bottom-top};
+  }
+  function apply(){
+    canvas.style.transform=`translate(${tx}px, ${ty}px) scale(${scale})`;
+    document.getElementById('zoomVal').textContent=Math.round(scale*100)+'%';
+  }
+  function clampView(){
+    const vw=innerWidth, vh=innerHeight;
+    const bounds=verticalBounds(), pad=viewPad();
+    tx=Math.min(vw-pad-TOTAL_X*scale,Math.max(pad-(TOTAL_X+TOTAL_W)*scale,tx));
+    const minTy=pad-bounds.bottom*scale;
+    const maxTy=vh-pad-bounds.top*scale;
+    ty=Math.min(maxTy, Math.max(minTy, ty));
+  }
+  function zoomAt(px,py,factor){
+    const s=Math.min(MAX_S, Math.max(MIN_S, scale*factor));
+    tx=px-(px-tx)*(s/scale);
+    ty=py-(py-ty)*(s/scale);
+    scale=s;
+    clampView();apply();
+  }
+  function initView(){
+    focusPanel(PX,PW,project);
+  }
+  function focusPanel(x,width,panel){
+    const vw=innerWidth, vh=innerHeight;
+    scale=Math.max(MIN_S,Math.min(1,(vw-70)/width));
+    tx=vw/2-(x+width/2)*scale;
+    ty=Math.max(viewPad(),(vh-panel.offsetHeight*scale)/2)-panelY(panel)*scale;
+    apply();
+  }
+  function resetView(){
+    const vw=innerWidth, vh=innerHeight;
+    const bounds=verticalBounds(), pad=viewPad();
+    scale=Math.min(1, (vw-2*pad)/TOTAL_W, (vh-2*pad)/bounds.height);
+    if(scale<MIN_S)scale=MIN_S;
+    tx=vw/2-(TOTAL_X+TOTAL_W/2)*scale;
+    ty=vh/2-(bounds.top+bounds.height/2)*scale;
+    apply();
+  }
+
+  /* ── modes ──────────────────────────────── */
+  let pen=false;
+  const toolPan=document.getElementById('toolPan');
+  const toolPen=document.getElementById('toolPen');
+  function setPen(v){
+    pen=v;
+    document.body.classList.toggle('pen',v);
+    toolPen.classList.toggle('active',v);
+    toolPan.classList.toggle('active',!v);
+  }
+  toolPan.addEventListener('click',()=>setPen(false));
+  toolPen.addEventListener('click',()=>setPen(true));
+  document.getElementById('toolUndo').addEventListener('click',()=>{
+    if(ink.lastElementChild)ink.lastElementChild.remove();
+  });
+  document.getElementById('toolClear').addEventListener('click',()=>{ink.innerHTML='';});
+  document.getElementById('zoomIn').addEventListener('click',()=>zoomAt(innerWidth/2,innerHeight/2,1.25));
+  document.getElementById('zoomOut').addEventListener('click',()=>zoomAt(innerWidth/2,innerHeight/2,.8));
+  document.getElementById('showProject').addEventListener('click',()=>focusPanel(PX,PW,project));
+  document.getElementById('showBusiness').addEventListener('click',()=>focusPanel(BX,BW,business));
+  document.getElementById('showCompetitors').addEventListener('click',()=>focusPanel(CX,CW,content));
+  document.getElementById('showEcosystem').addEventListener('click',()=>focusPanel(EX,EW,ecosystem));
+  document.getElementById('zoomFit').addEventListener('click',resetView);
+
+  /* ── pan / draw / pinch ─────────────────── */
+  const pointers=new Map();
+  let panStart=null, dragged=false, stroke=null, pinchD=0;
+
+  function canvasPt(e){
+    return {x:(e.clientX-tx)/scale, y:(e.clientY-ty)/scale};
+  }
+
+  viewport.addEventListener('pointerdown',e=>{
+    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pointers.size===2){
+      const [a,b]=[...pointers.values()];
+      pinchD=Math.hypot(a.x-b.x,a.y-b.y);
+      stroke=null;panStart=null;
+      return;
+    }
+    dragged=false;
+    if(pen){
+      const p=canvasPt(e);
+      stroke=document.createElementNS('http://www.w3.org/2000/svg','path');
+      stroke._pts=[p];
+      stroke.setAttribute('d',`M ${p.x} ${p.y}`);
+      ink.appendChild(stroke);
+    }else{
+      panStart={x:e.clientX-tx,y:e.clientY-ty};
+      viewport.classList.add('panning');
+    }
+  });
+
+  window.addEventListener('pointermove',e=>{
+    if(!pointers.has(e.pointerId))return;
+    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pointers.size===2){
+      const [a,b]=[...pointers.values()];
+      const d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(pinchD>0){
+        zoomAt((a.x+b.x)/2,(a.y+b.y)/2, d/pinchD);
+      }
+      pinchD=d;
+      return;
+    }
+    if(stroke){
+      const p=canvasPt(e);
+      const pts=stroke._pts, last=pts[pts.length-1];
+      if(Math.hypot(p.x-last.x,p.y-last.y)>1.5/scale){
+        pts.push(p);
+        stroke.setAttribute('d',stroke.getAttribute('d')+` L ${p.x} ${p.y}`);
+      }
+      dragged=true;
+    }else if(panStart){
+      const nx=e.clientX-panStart.x, ny=e.clientY-panStart.y;
+      if(Math.abs(nx-tx)+Math.abs(ny-ty)>3)dragged=true;
+      tx=nx;ty=ny;
+      clampView();apply();
+    }
+  });
+
+  window.addEventListener('pointerup',e=>{
+    if(dragged)lastDragAt=performance.now();
+    pointers.delete(e.pointerId);
+    if(pointers.size<2)pinchD=0;
+    stroke=null;panStart=null;
+    viewport.classList.remove('panning');
+  });
+  window.addEventListener('pointercancel',e=>{
+    pointers.delete(e.pointerId);
+    stroke=null;panStart=null;pinchD=0;
+    viewport.classList.remove('panning');
+  });
+
+  /* wheel: zoom around the pointer; drag to move the map */
+  viewport.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const pixels=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?innerHeight:1);
+    const step=Math.max(-400,Math.min(400,pixels));
+    zoomAt(e.clientX,e.clientY,Math.exp(-step*0.002));
+  },{passive:false});
+
+  /* ── init ─ */
+  window.addEventListener('resize',()=>{positionPanels();clampView();apply();});
+  window.addEventListener('load',()=>{
+    positionPanels();
+    initView();
+    cards.forEach((c,i)=>setTimeout(()=>c.classList.add('show'),80+i*25));
+  });
+
+</script>
+</body>
+</html>
