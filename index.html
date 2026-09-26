@@ -210,6 +210,7 @@
   .summary-stat span{font-size:13px;color:#989088;}
   .summary p{font-size:15px;line-height:1.55;color:#a9a9a9;}
   .summary .market-takeaway{border-top:1px solid var(--border);margin-top:14px;padding-top:12px;color:#d1c8b8;}
+  .summary p:last-child{margin-top:12px;}
   .summary a{color:#cbb27d;}
   .board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;padding:10px 35px 80px;}
   #wires{display:none;}
@@ -236,11 +237,18 @@
   .group-heading h2{font-size:27px;line-height:1.2;color:#eee7d9;}
   .group-heading p{font-size:14px;color:#a8a098;margin-top:7px;}
   .group-kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#c5aa76;margin-bottom:8px;}
-  .capacity{display:flex;align-items:baseline;gap:10px;margin-top:11px;}
-  .capacity b{font-size:18px;color:#e8d4a8;}
-  .capacity span{font-size:12px;color:#827e78;}
+  .capacity{display:flex;flex-direction:column;gap:3px;margin-top:11px;line-height:1.35;}
+  .capacity b{font-size:17px;color:#e8d4a8;}
+  .capacity span{font-size:12px;color:#aaa49b;}
   .feature-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
   .feature-tags span{font-size:12px;color:#c9c0af;background:#282622;border:1px solid #484138;border-radius:20px;padding:4px 7px;}
+  .official-site{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:13px;padding:10px 12px;border:1px solid #5b482c;background:#211b13;font-size:13px;line-height:1.45;}
+  .official-site .site-label{flex:none;color:#c6a972;font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
+  .official-site .site-value{text-align:right;color:#e7d5b5;}
+  .official-site a{color:#edd099;text-decoration:underline;text-underline-offset:3px;}
+  .official-site a+a{margin-left:10px;}
+  .official-site.missing{border-color:#39352f;background:#171614;}
+  .official-site.missing .site-value{color:#aaa49b;}
   .thumb{height:52px;background:linear-gradient(100deg,#1e1a14,#403520 70%,#5b4929);}
   .thumb::after{opacity:.35;}
   .thumb .num{font-size:52px;bottom:-9px;}
@@ -252,6 +260,7 @@
   .meta span{font-weight:400;}
   .card-fact{font-size:12px;color:#d1c8b8;line-height:1.5;margin-top:12px;min-height:36px;}
   .card-links{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;}
+  .details p a{color:#ddc68e;text-decoration:underline;text-underline-offset:2px;}
   .card-links a{font-size:12px;color:#ddc68e;text-decoration:none;border:1px solid #4a3c27;border-radius:30px;padding:6px 10px;transition:.2s;}
   .card-links a:hover{color:#fff;border-color:#b3904c;background:#3e311d;}
   .notes{font-size:11px;line-height:1.6;color:#8d8578;max-width:900px;margin:0 auto 100px;padding:0 20px;}
@@ -346,16 +355,18 @@
     <svg id="ink"></svg>
     <div id="content">
       <section class="hero">
-        <div class="eyebrow">Исследование рынка · 25 сентября 2026</div>
+        <div class="eyebrow">Исследование рынка · 26 сентября 2026</div>
         <h1>Карта конкурентов<br><em>Саратов</em></h1>
-        <p class="lede">Шесть клубов, с которыми «Мидис» стоит сравнить по масштабу, VIP-формату и дополнительному сервису.</p>
+        <p class="lede">Шесть клубных брендов, с которыми «Мидис» стоит сравнить по масштабу, VIP-формату и дополнительному сервису.</p>
       </section>
       <div class="summary">
         <div class="summary-top">
-          <div class="summary-stat"><strong>6</strong><span>сопоставимых предложений в Саратове</span></div>
+          <div class="summary-stat"><strong>6</strong><span>клубных брендов для сравнения</span></div>
+          <div class="summary-stat"><strong>3</strong><span>без подтверждённого официального сайта</span></div>
         </div>
         <p><b>Что видно на рынке:</b> VIP-зоны, консоли, групповые места, бар, акции и даже приложение уже есть у разных клубов. Предложение для «Мидис» — объединить бронь, посещения, награды и жизнь сообщества в одном сервисе.</p>
-        <p class="market-takeaway">Порядок отражает масштаб бренда и сходство опубликованного формата, без оценки выручки и загрузки. Адрес «Мидис» позволит уточнить географию конкуренции. <a href="https://langame.ru/computerniy_club_saratov" target="_blank" rel="noopener noreferrer">Каталог клубов ↗</a></p>
+        <p class="market-takeaway"><b>Сайты конкурентов:</b> у Colizeum и CyberX есть страницы саратовских клубов на сайтах сетей; у Cyber King — сайт клуба на Яндекс Бизнес. Для Voltage, Zeus и «Монзы» официальный сайт не удалось подтвердить.</p>
+        <p>ПК в карточках — сумма мест по зонам каждого филиала в LANGAME; консоли в эти числа не входят. Порядок отражает масштаб бренда и сходство формата. Адрес «Мидис» позволит уточнить географию конкуренции. <a href="https://langame.ru/computerniy_club_saratov" target="_blank" rel="noopener noreferrer">Каталог клубов ↗</a></p>
       </div>
       <main class="board" id="board">
         <div class="group-heading"><div class="group-kicker">Основная группа</div><h2>Ближе всего по формату</h2><p>Масштаб, VIP-места и дополнительные сценарии посещения.</p></div>
@@ -364,9 +375,10 @@
           <div class="card-body">
             <h3 class="card-title">Colizeum</h3>
             <div class="meta"><b>Адрес</b><span>Центр: Рабочая, 49; Блинова, 23</span></div>
-            <div class="capacity"><b>35 / 19 ПК</b><span>по опубликованным данным</span></div>
+            <div class="capacity"><b>Центр — 35 ПК · Блинова — 19 ПК</b><span>Центр: 10 общий + 25 VIP; Блинова: 8 общий + 11 VIP</span></div>
             <div class="feature-tags"><span>2 клуба в Саратове</span><span>25 VIP в центре</span><span>буткемпы</span><span>турниры сети</span></div>
-            <div class="details" id="details-1" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Игровые часы в общем зале и VIP, PS5; в филиале на Блинова также продают еду и напитки.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>Центр публикует кэшбэк и бонус новичку; Блинова — бонусы за покупки в баре и такси. Сеть проводит турниры.</p></div></div><div class="card-links"><a href="https://langame.ru/799452185_computerniy_club_colizeum-saratov-centr_saratov" target="_blank" rel="noopener noreferrer">Центр: ПК ↗</a><a href="https://langame.ru/799453699_computerniy_club_colizeum-blinova_saratov" target="_blank" rel="noopener noreferrer">Блинова: ПК ↗</a><a href="https://colizeumarena.com/blog/club/colizeum-saratov-centr/" target="_blank" rel="noopener noreferrer">Центр ↗</a><a href="https://colizeumarena.com/blog/club/saratov_blinova/" target="_blank" rel="noopener noreferrer">Блинова ↗</a><a href="https://2gis.ru/saratov/firm/70000001065314313" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/colizeum_saratov_centr" target="_blank" rel="noopener noreferrer">VK ↗</a><a href="https://colizeumarena.com/franchise/" target="_blank" rel="noopener noreferrer">Сеть ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-1"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
+            <div class="official-site"><span class="site-label">Официальный сайт</span><div class="site-value"><a href="https://colizeumarena.com/blog/club/colizeum-saratov-centr/" target="_blank" rel="noopener noreferrer">Центр ↗</a><a href="https://colizeumarena.com/blog/club/saratov_blinova/" target="_blank" rel="noopener noreferrer">Блинова ↗</a></div></div>
+            <div class="details" id="details-1" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Игровые часы в общем зале и VIP, PS5; в филиале на Блинова также продают еду и напитки.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>Центр публикует кэшбэк и бонус новичку; Блинова — бонусы за покупки в баре и такси. Сеть проводит турниры.</p></div></div><div class="card-links"><a href="https://langame.ru/799452185_computerniy_club_colizeum-saratov-centr_saratov" target="_blank" rel="noopener noreferrer">Каталог LANGAME: Центр ↗</a><a href="https://langame.ru/799453699_computerniy_club_colizeum-blinova_saratov" target="_blank" rel="noopener noreferrer">Каталог LANGAME: Блинова ↗</a><a href="https://colizeumarena.com/blog/club/colizeum-saratov-centr/" target="_blank" rel="noopener noreferrer">Центр ↗</a><a href="https://colizeumarena.com/blog/club/saratov_blinova/" target="_blank" rel="noopener noreferrer">Блинова ↗</a><a href="https://2gis.ru/saratov/firm/70000001065314313" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/colizeum_saratov_centr" target="_blank" rel="noopener noreferrer">VK ↗</a><a href="https://colizeumarena.com/franchise/" target="_blank" rel="noopener noreferrer">Сеть ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-1"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
           </div>
         </article>
 <article class="node-card direct">
@@ -374,9 +386,10 @@
           <div class="card-body">
             <h3 class="card-title">Voltage</h3>
             <div class="meta"><b>Адрес</b><span>Black: Астраханская, 102 к8; Reborn: Московская, 84; Lounge: Усть-Курдюмская, 9</span></div>
-            <div class="capacity"><b>55 / 35 / 19 ПК</b><span>по опубликованным данным</span></div>
+            <div class="capacity"><b>Black — 55 ПК · Reborn — 35 ПК · Lounge — 19 ПК</b><span>Black: 40 Premium/PRO + 15 VIP; Reborn: 15 общий + 10 VIP + 10 PRO; Lounge: 14 общий + 5 VIP</span></div>
             <div class="feature-tags"><span>3 формата в городе</span><span>VIP и PRO</span><span>кальян в Black и Lounge</span><span>бар</span></div>
-            <div class="details" id="details-2" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Почасовые и пакетные тарифы Premium / PRO / VIP, зоны DUO / TRIO, PS5, бар и кальян в Black.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>В профиле Black заявлены 300 ₽ за возвращение, бонусы за отзывы, скидки в день рождения и утром; сеть сообщает о турнирах.</p></div></div><div class="card-links"><a href="https://langame.ru/799452783_computerniy_club_voltage-black_saratov" target="_blank" rel="noopener noreferrer">Black ↗</a><a href="https://langame.ru/799448415_computerniy_club_voltage-reborn_saratov" target="_blank" rel="noopener noreferrer">Reborn ↗</a><a href="https://langame.ru/799453165_computerniy_club_voltage-lounge_saratov" target="_blank" rel="noopener noreferrer">Lounge ↗</a><a href="https://2gis.ru/saratov/firm/70000001046676304" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/voltage_saratov" target="_blank" rel="noopener noreferrer">VK ↗</a><a href="https://t.me/voltage_black" target="_blank" rel="noopener noreferrer">Telegram ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-2"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
+            <div class="official-site missing"><span class="site-label">Официальный сайт</span><div class="site-value">Не подтверждён · <a href="https://vk.com/voltage_saratov" target="_blank" rel="noopener noreferrer">страница клуба VK ↗</a></div></div>
+            <div class="details" id="details-2" inert aria-hidden="true"><div class="dwrap"><p><a href="https://voltageblack.com/" target="_blank" rel="noopener noreferrer">voltageblack.com ↗</a> описывает клуб в Москве; связь с саратовским Voltage не подтверждена.</p><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Почасовые и пакетные тарифы Premium / PRO / VIP, зоны DUO / TRIO, PS5, бар и кальян в Black.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>В профиле Black заявлены 300 ₽ за возвращение, бонусы за отзывы, скидки в день рождения и утром; сеть сообщает о турнирах.</p></div></div><div class="card-links"><a href="https://langame.ru/799452783_computerniy_club_voltage-black_saratov" target="_blank" rel="noopener noreferrer">Каталог LANGAME: Black ↗</a><a href="https://langame.ru/799448415_computerniy_club_voltage-reborn_saratov" target="_blank" rel="noopener noreferrer">Каталог LANGAME: Reborn ↗</a><a href="https://langame.ru/799453165_computerniy_club_voltage-lounge_saratov" target="_blank" rel="noopener noreferrer">Каталог LANGAME: Lounge ↗</a><a href="https://2gis.ru/saratov/firm/70000001046676304" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/voltage_saratov" target="_blank" rel="noopener noreferrer">VK ↗</a><a href="https://t.me/voltage_black" target="_blank" rel="noopener noreferrer">Telegram ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-2"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
           </div>
         </article>
 <article class="node-card direct">
@@ -384,9 +397,10 @@
           <div class="card-body">
             <h3 class="card-title">Зевс</h3>
             <div class="meta"><b>Адрес</b><span>Советская, 69</span></div>
-            <div class="capacity"><b>69 ПК</b><span>по опубликованным данным</span></div>
+            <div class="capacity"><b>69 ПК всего</b><span>27 общий зал + 42 VIP</span></div>
             <div class="feature-tags"><span>42 VIP</span><span>6 PS5</span><span>кальян</span><span>фуд-корт</span></div>
-            <div class="details" id="details-3" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Игровое время в общем зале и VIP, шесть PS5, кальян и фуд-корт.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>В профиле клуба заявлены 100 ₽ на счёт при регистрации и один игровой час за приведённого друга.</p></div></div><div class="card-links"><a href="https://langame.ru/799451269_computerniy_club_zeus_saratov" target="_blank" rel="noopener noreferrer">LANGAME ↗</a><a href="https://2gis.ru/saratov/firm/70000001064280422" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/zeusgl64" target="_blank" rel="noopener noreferrer">VK ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-3"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
+            <div class="official-site missing"><span class="site-label">Официальный сайт</span><div class="site-value">Не подтверждён · <a href="https://vk.com/zeusgl64" target="_blank" rel="noopener noreferrer">страница клуба VK ↗</a></div></div>
+            <div class="details" id="details-3" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Игровое время в общем зале и VIP, шесть PS5, кальян и фуд-корт.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>В профиле клуба заявлены 100 ₽ на счёт при регистрации и один игровой час за приведённого друга.</p></div></div><div class="card-links"><a href="https://langame.ru/799451269_computerniy_club_zeus_saratov" target="_blank" rel="noopener noreferrer">Каталог LANGAME ↗</a><a href="https://2gis.ru/saratov/firm/70000001064280422" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/zeusgl64" target="_blank" rel="noopener noreferrer">VK ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-3"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
           </div>
         </article>
 <article class="node-card direct">
@@ -394,9 +408,10 @@
           <div class="card-body">
             <h3 class="card-title">Монза</h3>
             <div class="meta"><b>Адрес</b><span>Большая Казачья, 113/38</span></div>
-            <div class="capacity"><b>33 ПК</b><span>по опубликованным данным</span></div>
+            <div class="capacity"><b>33 ПК всего</b><span>20 общий зал + 13 VIP</span></div>
             <div class="feature-tags"><span>13 VIP</span><span>бар</span><span>кальян</span></div>
-            <div class="details" id="details-6" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Общий зал и VIP, четыре PS5 Pro, кальян и снэк-бар.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>В проверенном профиле клуба публичная программа лояльности или реферальная акция не указана.</p></div></div><div class="card-links"><a href="https://langame.ru/799462264_computerniy_club_monza_saratov" target="_blank" rel="noopener noreferrer">LANGAME ↗</a><a href="https://2gis.ru/saratov/firm/70000001117750386" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/monza.saratov" target="_blank" rel="noopener noreferrer">VK ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-6"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
+            <div class="official-site missing"><span class="site-label">Официальный сайт</span><div class="site-value">Не подтверждён</div></div>
+            <div class="details" id="details-6" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Общий зал и VIP, четыре PS5 Pro, кальян и снэк-бар.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>В проверенном профиле клуба публичная программа лояльности или реферальная акция не указана.</p></div></div><div class="card-links"><a href="https://langame.ru/799462264_computerniy_club_monza_saratov" target="_blank" rel="noopener noreferrer">Каталог LANGAME ↗</a><a href="https://2gis.ru/saratov/firm/70000001117750386" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/monza.saratov" target="_blank" rel="noopener noreferrer">VK ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-6"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
           </div>
         </article>
         <div class="group-heading"><div class="group-kicker">Дополнительное сравнение</div><h2>Другие сильные альтернативы</h2><p>Сопоставимы по игровым местам; набор услуг отличается от предполагаемого формата «Мидис».</p></div>
@@ -405,9 +420,10 @@
           <div class="card-body">
             <h3 class="card-title">CyberX Community</h3>
             <div class="meta"><b>Адрес</b><span>Вольская, 83</span></div>
-            <div class="capacity"><b>42 ПК</b><span>по опубликованным данным</span></div>
+            <div class="capacity"><b>42 ПК всего</b><span>25 общий зал + 17 VIP</span></div>
             <div class="feature-tags"><span>9 залов</span><span>VIP-тариф</span><span>4 TV-зоны</span></div>
-            <div class="details" id="details-4" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Тарифы Standard / VIP на 1, 3, 5 часов и ночь; четыре TV-зоны.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>Собственное приложение упрощает повторную бронь; публичную бонусную программу именно саратовского филиала не удалось подтвердить.</p></div></div><div class="card-links"><a href="https://cyberxcommunity.ru/kluby/rossiya/saratov/volskaya.html" target="_blank" rel="noopener noreferrer">Клуб ↗</a><a href="https://cyberxcommunity.ru/" target="_blank" rel="noopener noreferrer">Сайт ↗</a><a href="https://2gis.ru/saratov/firm/70000001096094795" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/club228559670" target="_blank" rel="noopener noreferrer">VK ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-4"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
+            <div class="official-site"><span class="site-label">Официальный сайт</span><div class="site-value"><a href="https://cyberxcommunity.ru/kluby/rossiya/saratov/volskaya.html" target="_blank" rel="noopener noreferrer">CyberX Вольская ↗</a></div></div>
+            <div class="details" id="details-4" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Тарифы Standard / VIP на 1, 3, 5 часов и ночь; четыре TV-зоны.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>Собственное приложение упрощает повторную бронь; публичную бонусную программу именно саратовского филиала не удалось подтвердить.</p></div></div><div class="card-links"><a href="https://cyberxcommunity.ru/kluby/rossiya/saratov/volskaya.html" target="_blank" rel="noopener noreferrer">Официальная страница ↗</a><a href="https://langame.ru/799454735_computerniy_club_cyberx_saratov" target="_blank" rel="noopener noreferrer">Каталог LANGAME ↗</a><a href="https://cyberxcommunity.ru/" target="_blank" rel="noopener noreferrer">Сайт сети ↗</a><a href="https://2gis.ru/saratov/firm/70000001096094795" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/club228559670" target="_blank" rel="noopener noreferrer">VK ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-4"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
           </div>
         </article>
 <article class="node-card partial">
@@ -415,9 +431,10 @@
           <div class="card-body">
             <h3 class="card-title">Сайбер Кинг</h3>
             <div class="meta"><b>Адрес</b><span>пр. Петра Столыпина, 10</span></div>
-            <div class="capacity"><b>40 ПК</b><span>по опубликованным данным</span></div>
+            <div class="capacity"><b>40 ПК всего</b><span>35 общий зал + 5 VIP</span></div>
             <div class="feature-tags"><span>кальян</span><span>Boot Camp</span><span>снэк-бар</span></div>
-            <div class="details" id="details-5" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Игровое время на 40 ПК, PS5, кальян и снэк-бар.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>В проверенных открытых страницах клуба формальная программа бонусов или приглашений не опубликована.</p></div></div><div class="card-links"><a href="https://cyber-king64.clients.site/" target="_blank" rel="noopener noreferrer">Клуб ↗</a><a href="https://2gis.ru/saratov/firm/70000001052144380" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/cyberking64" target="_blank" rel="noopener noreferrer">VK ↗</a><a href="https://t.me/cyber_king64" target="_blank" rel="noopener noreferrer">Telegram ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-5"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
+            <div class="official-site"><span class="site-label">Сайт клуба</span><div class="site-value"><a href="https://cyber-king64.clients.site/" target="_blank" rel="noopener noreferrer">Яндекс Бизнес ↗</a></div></div>
+            <div class="details" id="details-5" inert aria-hidden="true"><div class="dwrap"><div class="biz-grid"><div><div class="biz-label">На чём зарабатывают</div><p>Игровое время на 40 ПК, PS5, кальян и снэк-бар.</p></div><div><div class="biz-label">Как возвращают гостей</div><p>В проверенных открытых страницах клуба формальная программа бонусов или приглашений не опубликована.</p></div></div><div class="card-links"><a href="https://cyber-king64.clients.site/" target="_blank" rel="noopener noreferrer">Сайт клуба ↗</a><a href="https://langame.ru/799448146_computerniy_club_cyber-king-na-kirova_saratov" target="_blank" rel="noopener noreferrer">Каталог LANGAME ↗</a><a href="https://2gis.ru/saratov/firm/70000001052144380" target="_blank" rel="noopener noreferrer">2ГИС ↗</a><a href="https://vk.com/cyberking64" target="_blank" rel="noopener noreferrer">VK ↗</a><a href="https://t.me/cyber_king64" target="_blank" rel="noopener noreferrer">Telegram ↗</a></div></div></div><button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-5"><span>Подробнее и источники</span><span class="toggle-mark" aria-hidden="true">+</span></button>
           </div>
         </article>
       </main>
@@ -447,7 +464,7 @@
         </div>
         <div class="biz-insight"><b>Что показывает рынок</b><p>По данным АРКИ за II квартал 2026 года, около 80% выручки клубам дали игровые часы. По сравнению с тем же кварталом 2025 года гости стали играть чаще, а уникальных гостей на клуб стало меньше. Поэтому важны и приток новых игроков, и повторные визиты; итог каждой акции оцениваем по деньгам после затрат. <a href="https://arki.team/results/barometer" target="_blank" rel="noopener noreferrer">Барометр АРКИ ↗</a></p></div>
       </section>
-      <div class="notes">Срез: 25.09.2026. Показаны клубы с публичными профилями без отметки о закрытии; сведения о местах, услугах и акциях могут меняться. Это выборка похожих предложений, а не все клубы Саратова. Данные о фактической загрузке и прибыли конкурентов не опубликованы.</div>
+      <div class="notes">Срез: 26.09.2026. Показаны клубы с публичными профилями без отметки о закрытии; сведения о местах, услугах, акциях и сайтах могут меняться. Это выборка похожих предложений, а не все клубы Саратова. Данные о фактической загрузке и прибыли конкурентов не опубликованы.</div>
     </div>
     <section id="ecosystem" aria-labelledby="eco-title">
       <div class="eco-hero">
